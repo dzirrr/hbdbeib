@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
+    <title>Selamat Ulang Tahun Beib:)</title>
+    
+    <!-- Google Fonts untuk tipografi elegan -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS untuk styling responsif dan cepat -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Library Canvas Confetti untuk efek ledakan kertas/hati -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Konfigurasi warna kustom Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        romantic: {
+                            50: '#fdf2f8',
+                            100: '#fce7f3',
+                            200: '#fbcfe8',
+                            300: '#f9a8d4',
+                            400: '#f472b6',
+                            500: '#ec4899',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Quicksand"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* CSS Kustom untuk Animasi dan Efek Spesifik */
+        body {
+            /* Memastikan tinggi full screen bahkan di browser mobile (dvh) */
+            height: 100dvh;
+            overflow: hidden; /* Mencegah scroll default, kita atur per halaman */
+            background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 100%);
+        }
+
+        /* --- Transisi Halaman --- */
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s;
+            display: flex;
+            flex-direction: column;
+        }
+        .page.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
+
+        /* --- Efek Glassmorphism (Kaca Buram) --- */
+        .glass {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        /* --- Animasi Tombol Berdenyut (Pulse) --- */
+        .btn-pulse {
+            animation: pulse-soft 2s infinite;
+        }
+        @keyframes pulse-soft {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(236, 72, 153, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+        }
+
+        /* --- Kursor Mengetik (Typing Effect) --- */
+        .cursor::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- Animasi Piringan Hitam (Music Player) --- */
+        .spin {
+            animation: spin-record 5s linear infinite;
+        }
+        .spin-paused {
+            animation-play-state: paused;
+        }
+        @keyframes spin-record { 100% { transform: rotate(360deg); } }
+
+        /* --- Animasi Balon Terbang --- */
+        .balloon {
+            position: absolute;
+            bottom: -100px;
+            background-color: rgba(244, 114, 182, 0.6);
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1);
+            animation: float-up linear infinite;
+            z-index: 0;
+        }
+        .balloon::before {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 40px;
+            background-color: rgba(200, 200, 200, 0.5);
+        }
+        @keyframes float-up {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
+        }
+
+        /* --- Efek Foto Muncul Perlahan (Scroll Reveal) --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Sparkles (Bintang kecil berkedip) --- */
+        .sparkle {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23f472b6"><path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: twinkle 1.5s infinite alternate;
+            pointer-events: none;
+            z-index: 5;
+        }
+        @keyframes twinkle {
+            0% { transform: scale(0.5); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        /* Custom Scrollbar untuk Galeri */
+        .gallery-container::-webkit-scrollbar { width: 6px; }
+        .gallery-container::-webkit-scrollbar-track { background: transparent; }
+        .gallery-container::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-gray-800 font-sans antialiased relative">
+
+    <!-- Audio Player Tersembunyi -->
+    <!-- GANTI SRC DENGAN LINK LAGU MP3 PILIHANMU -->
+    <audio id="bg-music" src="Lagu.mp3" loop preload="auto"></audio>
+
+    <!-- ==========================================
+         HALAMAN 1: OPENING (Kata Sambutan)
+         ========================================== -->
+    <section id="page-1" class="page active justify-center items-center px-6 text-center">
+        <!-- Dekorasi Background -->
+        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-10 left-10 w-32 h-32 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-pulse"></div>
+            <div class="absolute bottom-20 right-10 w-40 h-40 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-pulse" style="animation-delay: 1s;"></div>
+        </div>
+
+        <div class="z-10 max-w-lg w-full">
+            <h1 class="font-serif text-3xl md:text-5xl text-romantic-500 mb-6 leading-tight min-h-[100px]" id="typing-text">
+                <!-- Teks akan diisi oleh JavaScript -->
+            </h1>
+            
+            <button onclick="goToPage(2)" class="mt-8 opacity-0 transition-opacity duration-1000 ease-in-out bg-romantic-500 hover:bg-romantic-400 text-white font-semibold py-3 px-8 rounded-full shadow-lg btn-pulse transform transition hover:scale-105" id="btn-next-1">
+                Buka Kejutannya✨
+            </button>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         HALAMAN 2: MUSIC PLAYER
+         ========================================== -->
+    <section id="page-2" class="page justify-center items-center px-4">
+        <!-- Tombol Kembali -->
+        <button onclick="goToPage(1)" class="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-white/40 hover:bg-white/70 backdrop-blur-md text-gray-700 rounded-full shadow transition group">
+            <svg class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span class="text-sm font-medium">Kembali</span>
+        </button>
+
+        <!-- Latar belakang abstrak -->
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518599904199-0ca897819ddb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center opacity-20 z-0"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-pink-100/80 to-purple-100/80 z-0"></div>
+
+        <div class="z-10 w-full max-w-sm glass rounded-3xl p-8 flex flex-col items-center text-center relative overflow-hidden">
+            <!-- Sparkles di pojok -->
+            <div class="sparkle top-4 left-4"></div>
+            <div class="sparkle bottom-4 right-4" style="animation-delay: 0.5s;"></div>
+
+            <h2 class="font-serif text-2xl font-semibold text-gray-800 mb-2">Lagu spesial untuk kamu🎶</h2>
+
+            <!-- Foto / Album Art -->
+            <!-- Ganti URL foto dengan foto pasanganmu -->
+            <div class="w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-xl mb-6 relative group">
+                <img id="record-image" src="Piringan.png" alt="Kenangan" class="w-full h-full object-cover spin spin-paused transition-all duration-500">
+                <!-- Titik tengah piringan hitam -->
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full border-2 border-gray-200"></div>
+            </div>
+
+            <!-- Kontrol Audio -->
+            <div class="w-full mb-8">
+                <div class="flex justify-center items-center gap-6">
+                    <button class="text-gray-400 hover:text-romantic-500 transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg></button>
+                    
+                    <button id="play-pause-btn" onclick="togglePlay()" class="w-16 h-16 bg-romantic-500 text-white rounded-full flex justify-center items-center shadow-lg hover:scale-105 transition-transform">
+                        <!-- Icon Pause (Default karena autoplay saat masuk halaman ini) -->
+                        <svg id="icon-pause" class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        <!-- Icon Play (Disembunyikan) -->
+                        <svg id="icon-play" class="w-8 h-8 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    
+                    <button class="text-gray-400 hover:text-romantic-500 transition"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg></button>
+                </div>
+            </div>
+
+            <button onclick="goToPage(3)" class="text-romantic-500 font-medium hover:text-romantic-600 transition flex items-center gap-2 group">
+                The Memories☺️
+                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         HALAMAN 3: GALLERY KENANGAN
+         ========================================== -->
+    <section id="page-3" class="page overflow-hidden bg-romantic-50">
+        <!-- Tombol Kembali -->
+        <button onclick="goToPage(2)" class="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-white/60 hover:bg-white/90 backdrop-blur-md text-gray-700 rounded-full shadow transition group">
+            <svg class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span class="text-sm font-medium">Kembali</span>
+        </button>
+
+        <!-- Kontainer Balon Terbang (diisi via JS) -->
+        <div id="balloon-container" class="absolute inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+        <!-- Header Galeri -->
+        <div class="z-10 w-full pt-12 pb-6 px-6 text-center glass rounded-b-3xl">
+            <h2 class="font-serif text-3xl font-bold text-gray-800">Kenangan Indah Kita✨</h2>
+            <p class="text-gray-600 mt-2">Momen-momen yang menjadi cerita</p>
+        </div>
+
+        <!-- Area Scroll Galeri -->
+        <div class="z-10 w-full flex-1 overflow-y-auto gallery-container pb-20 px-4 mt-6">
+            <div class="max-w-2xl mx-auto space-y-12 pb-10">
+                
+                <!-- Item Galeri 1 -->
+                <!-- Ganti URL img dengan fotomu -->
+                <div class="reveal relative bg-white p-4 rounded-2xl shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                    <div class="sparkle -top-3 -left-3"></div>
+                    <img src="foto 1.jpg" alt="Kenangan 1" class="w-full aspect-[4/3] object-cover rounded-xl">
+                    <p class="font-serif text-center mt-4 text-lg text-gray-700">Awal cerita tentang kita👩‍❤️‍👨</p>
+                </div>
+
+                <!-- Item Galeri 2 -->
+                <div class="reveal relative bg-white p-4 rounded-2xl shadow-xl transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+                    <div class="sparkle top-1/2 -right-4" style="animation-delay: 0.7s;"></div>
+                    <img src="foto 2.jpg" alt="Kenangan 2" class="w-full aspect-[4/3] object-cover rounded-xl">
+                    <p class="font-serif text-center mt-4 text-lg text-gray-700">Kenangan yang berarti🎞️</p>
+                </div>
+
+                <!-- Item Galeri 3 -->
+                <div class="reveal relative bg-white p-4 rounded-2xl shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                    <div class="sparkle -bottom-3 -left-2" style="animation-delay: 1.2s;"></div>
+                    <img src="foto 3.png" alt="Kenangan 3" class="w-full aspect-[4/3] object-cover rounded-xl">
+                    <p class="font-serif text-center mt-4 text-lg text-gray-700">Senyummu adalah kebahagiaanku☺️</p>
+                </div>
+                
+                <!-- Item Galeri 4 -->
+                <div class="reveal relative bg-white p-4 rounded-2xl shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                    <div class="sparkle -bottom-3 -left-2" style="animation-delay: 1.2s;"></div>
+                    <img src="foto 4.jpg" alt="Kenangan " class="w-full aspect-[4/3] object-cover rounded-xl">
+                    <p class="font-serif text-center mt-4 text-lg text-gray-700">Bahagiaku ada di tawamu☺️</p>
+                </div>
+
+                <!-- Item Galeri 5 -->
+                <div class="reveal relative bg-white p-4 rounded-2xl shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                    <div class="sparkle -bottom-3 -left-2" style="animation-delay: 1.2s;"></div>
+                    <img src="foto 5.jpg" alt="Kenangan " class="w-full aspect-[4/3] object-cover rounded-xl">
+                    <p class="font-serif text-center mt-4 text-lg text-gray-700">Melengkapi setiap kurangku✨</p>
+                </div>
+
+                <!-- Item Galeri 6 -->
+                <div class="reveal relative bg-white p-4 rounded-2xl shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                    <div class="sparkle -bottom-3 -left-2" style="animation-delay: 1.2s;"></div>
+                    <img src="foto 6.jpg" alt="Kenangan " class="w-full aspect-[4/3] object-cover rounded-xl">
+                    <p class="font-serif text-center mt-4 text-lg text-gray-700">Tertawa dalam setiap kekonyolan😂</p>
+                </div>
+
+                <!-- Item Galeri 7 -->
+                <div class="reveal relative bg-white p-4 rounded-2xl shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                    <div class="sparkle -bottom-3 -left-2" style="animation-delay: 1.2s;"></div>
+                    <img src="foto 7.jpg" alt="Kenangan " class="w-full aspect-[4/3] object-cover rounded-xl">
+                    <p class="font-serif text-center mt-4 text-lg text-gray-700">Maaf ku belum bisa memberi kebahagiaan sejati🥹</p>
+                </div>
+
+                <!-- Item Galeri 8 -->
+                <div class="reveal relative bg-white p-4 rounded-2xl shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                    <div class="sparkle -bottom-3 -left-2" style="animation-delay: 1.2s;"></div>
+                    <img src="foto 8.png" alt="Kenangan " class="w-full aspect-[4/3] object-cover rounded-xl">
+                    <p class="font-serif text-center mt-4 text-lg text-gray-700">Namun kukan berusaha membahagiaanmu dengan semampuku💌</p>
+                </div>
+
+                <!-- Item Galeri 9 -->
+                <div class="reveal relative bg-white p-4 rounded-2xl shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-300">
+                    <div class="sparkle -bottom-3 -left-2" style="animation-delay: 1.2s;"></div>
+                    <img src="foto 9.jpg" alt="Kenangan " class="w-full aspect-[4/3] object-cover rounded-xl">
+                    <p class="font-serif text-center mt-4 text-lg text-gray-700">Terima kasih sudah hadir di hidupku❤️</p>
+                </div>
+
+                <!-- Pesan Penutup -->
+                <div class="reveal text-center pt-8 pb-12">
+                    <p class="font-serif text-2xl text-romantic-500 font-bold">Selamat Ulang Tahun Beib<br>Bahagia dan Sehat Selalu🥰</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         LOGIKA JAVASCRIPT
+         ========================================== -->
+    <script>
+        // --- 1. Logika Mengetik (Typing Effect) Halaman 1 ---
+        const textToType = "Haii Beib,\nselamat ulang tahun\nAku punya kejutan untukmu🥳";
+        const typingElement = document.getElementById('typing-text');
+        const btnNext1 = document.getElementById('btn-next-1');
+        let typeIndex = 0;
+
+        function typeWriter() {
+            if (typeIndex < textToType.length) {
+                // Menangani baris baru (newline)
+                if(textToType.charAt(typeIndex) === '\n') {
+                    typingElement.innerHTML += '<br>';
+                } else {
+                    typingElement.innerHTML += textToType.charAt(typeIndex);
+                }
+                typeIndex++;
+                setTimeout(typeWriter, 80); // Kecepatan mengetik (ms)
+            } else {
+                // Hapus kursor setelah selesai dan tampilkan tombol
+                typingElement.classList.remove('cursor');
+                btnNext1.classList.remove('opacity-0');
+            }
+        }
+
+        // Mulai animasi ngetik saat halaman dimuat
+        window.onload = () => {
+            typingElement.classList.add('cursor');
+            setTimeout(typeWriter, 1000); // Jeda 1 detik sebelum mulai ngetik
+        };
+
+        // --- 2. Navigasi Antar Halaman ---
+        let audioPlayed = false;
+        const bgMusic = document.getElementById('bg-music');
+        let balloonInterval; // Tambahkan variabel untuk mengontrol interval balon
+
+        function goToPage(pageNumber) {
+            // Sembunyikan semua halaman
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Tampilkan halaman yang dituju
+            const nextPage = document.getElementById(`page-${pageNumber}`);
+            nextPage.classList.add('active');
+
+            // Logika spesifik per halaman
+            if (pageNumber === 2) {
+                // Tembakkan Confetti bentuk hati saat klik Next pertama kali
+                fireConfetti();
+                
+                // Autoplay musik jika belum pernah diputar (Interaksi user sudah terjadi)
+                if (!audioPlayed) {
+                    bgMusic.play().catch(e => console.log("Audio autoplay dicegah browser:", e));
+                    audioPlayed = true;
+                    document.getElementById('record-image').classList.remove('spin-paused');
+                }
+            }
+
+            if (pageNumber === 3) {
+                // Inisialisasi animasi galeri dan balon saat masuk halaman 3
+                createBalloons();
+                // Trigger scroll event sedikit untuk memunculkan foto pertama
+                setTimeout(() => checkReveal(), 300);
+            } else {
+                // Hentikan interval pembuatan balon jika keluar dari halaman 3
+                if (balloonInterval) clearInterval(balloonInterval);
+            }
+        }
+
+        // --- 3. Efek Confetti ---
+        function fireConfetti() {
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ffb6c1', '#ff69b4', '#ff1493'] // Warna pink/merah
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ffb6c1', '#ff69b4', '#ff1493']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // --- 4. Kontrol Music Player ---
+        const iconPlay = document.getElementById('icon-play');
+        const iconPause = document.getElementById('icon-pause');
+        const recordImg = document.getElementById('record-image');
+
+        function togglePlay() {
+            if (bgMusic.paused) {
+                bgMusic.play();
+                iconPlay.classList.add('hidden');
+                iconPause.classList.remove('hidden');
+                recordImg.classList.remove('spin-paused');
+            } else {
+                bgMusic.pause();
+                iconPause.classList.add('hidden');
+                iconPlay.classList.remove('hidden');
+                recordImg.classList.add('spin-paused');
+            }
+        }
+
+        // --- 5. Animasi Scroll (Reveal) di Halaman 3 ---
+        const reveals = document.querySelectorAll('.reveal');
+        const galleryContainer = document.querySelector('.gallery-container');
+
+        function checkReveal() {
+            const triggerBottom = window.innerHeight * 0.85; // Titik pemicu (85% layar)
+
+            reveals.forEach(reveal => {
+                // Karena kita menggunakan overflow-y pada container, bukan body
+                const revealTop = reveal.getBoundingClientRect().top;
+
+                if (revealTop < triggerBottom) {
+                    reveal.classList.add('active');
+                }
+            });
+        }
+        // Dengarkan scroll pada container galeri
+        galleryContainer.addEventListener('scroll', checkReveal);
+
+
+        // --- 6. Generator Balon Terbang di Background Halaman 3 ---
+        function createBalloons() {
+            const container = document.getElementById('balloon-container');
+            const colors = ['#f9a8d4', '#f472b6', '#c084fc', '#e879f9', '#fbcfe8']; // Variasi warna pastel
+
+            // Bersihkan interval sebelumnya jika ada agar tidak menumpuk saat bolak-balik halaman
+            if (balloonInterval) clearInterval(balloonInterval);
+
+            // Buat balon baru setiap beberapa detik
+            balloonInterval = setInterval(() => {
+                const balloon = document.createElement('div');
+                balloon.classList.add('balloon');
+                
+                // Pengaturan acak
+                const size = Math.random() * 40 + 40; // Ukuran 40px - 80px
+                const leftPos = Math.random() * 100; // Posisi horizontal 0% - 100%
+                const animDuration = Math.random() * 5 + 8; // Durasi 8s - 13s
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                balloon.style.width = `${size}px`;
+                balloon.style.height = `${size * 1.2}px`; // Sedikit lonjong
+                balloon.style.left = `${leftPos}%`;
+                balloon.style.backgroundColor = color;
+                balloon.style.animationDuration = `${animDuration}s`;
+
+                container.appendChild(balloon);
+
+                // Hapus balon setelah selesai animasi agar memori tidak penuh
+                setTimeout(() => {
+                    balloon.remove();
+                }, animDuration * 1000);
+            }, 1500); // Munculkan balon setiap 1.5 detik
+        }
+
+    </script>
+</body>
+</html>
